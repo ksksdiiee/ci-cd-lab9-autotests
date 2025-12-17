@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тестовая страница регистрации</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        input:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            display: none;
+            text-align: center;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .logout-btn {
+            background-color: #dc3545;
+            margin-top: 10px;
+        }
+        .logout-btn:hover {
+            background-color: #c82333;
+        }
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        .form-row .form-group {
+            flex: 1;
+        }
+        .requirements {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="registration-form">
+            <h2>Регистрация нового пользователя</h2>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="firstName">Имя*</label>
+                    <input type="text" id="firstName" name="firstName" placeholder="Введите ваше имя" required>
+                </div>
+                <div class="form-group">
+                    <label for="lastName">Фамилия*</label>
+                    <input type="text" id="lastName" name="lastName" placeholder="Введите вашу фамилию" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email*</label>
+                <input type="email" id="email" name="email" placeholder="example@mail.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Телефон</label>
+                <input type="tel" id="phone" name="phone" placeholder="+7 (XXX) XXX-XX-XX">
+            </div>
+
+            <div class="form-group">
+                <label for="nickname">Никнейм*</label>
+                <input type="text" id="nickname" name="nickname" placeholder="Придумайте никнейм" required>
+                <div class="requirements">Может содержать буквы, цифры и символы _ - .</div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="password">Пароль*</label>
+                    <input type="password" id="password" name="password" placeholder="Не менее 8 символов" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Подтверждение пароля*</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Повторите пароль" required>
+                </div>
+            </div>
+            
+            <div class="requirements">Пароль должен содержать не менее 8 символов, включая заглавные буквы, цифры и специальные символы</div>
+
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="terms" name="terms" required>
+                    Я согласен с условиями использования и политикой конфиденциальности
+                </label>
+            </div>
+
+            <button id="register-btn" onclick="register()">Зарегистрироваться</button>
+            
+            <div id="message" class="message"></div>
+        </div>
+        
+        <div id="welcome-page" style="display: none;">
+            <h2>Добро пожаловать, <span id="user-name"></span>!</h2>
+            <p>Регистрация прошла успешно. Ваши данные:</p>
+            <div id="user-data" style="background-color: #f8f9fa; padding: 15px; border-radius: 6px; margin: 20px 0;">
+                <p><strong>Имя:</strong> <span id="display-firstName"></span></p>
+                <p><strong>Фамилия:</strong> <span id="display-lastName"></span></p>
+                <p><strong>Email:</strong> <span id="display-email"></span></p>
+                <p><strong>Телефон:</strong> <span id="display-phone"></span></p>
+                <p><strong>Никнейм:</strong> <span id="display-nickname"></span></p>
+            </div>
+            <button id="logout-btn" class="logout-btn" onclick="logout()">Выйти (Logout)</button>
+        </div>
+    </div>
+
+    <script>
+        // Массив для хранения зарегистрированных пользователей
+        let registeredUsers = [];
+
+        function register() {
+            // Получаем значения полей
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const nickname = document.getElementById('nickname').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const termsAccepted = document.getElementById('terms').checked;
+            const messageDiv = document.getElementById('message');
+            
+            // Сбрасываем предыдущие сообщения
+            messageDiv.className = 'message';
+            messageDiv.style.display = 'none';
+            
+            // Валидация обязательных полей
+            if (!firstName || !lastName || !email || !nickname || !password || !confirmPassword) {
+                showMessage('Пожалуйста, заполните все обязательные поля (отмеченные *)', 'error');
+                return;
+            }
+            
+            // Проверка согласия с условиями
+            if (!termsAccepted) {
+                showMessage('Необходимо согласиться с условиями использования', 'error');
+                return;
+            }
+            
+            // Валидация email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showMessage('Введите корректный email адрес', 'error');
+                return;
+            }
+            
+            // Валидация пароля
+            if (password.length < 8) {
+                showMessage('Пароль должен содержать не менее 8 символов', 'error');
+                return;
+            }
+            
+            const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/;
+            if (!passwordRegex.test(password)) {
+                showMessage('Пароль должен содержать хотя бы одну заглавную букву, одну цифру и один специальный символ', 'error');
+                return;
+            }
+            
+            // Проверка совпадения паролей
+            if (password !== confirmPassword) {
+                showMessage('Пароли не совпадают', 'error');
+                return;
+            }
+            
+            // Проверка уникальности никнейма
+            if (registeredUsers.some(user => user.nickname.toLowerCase() === nickname.toLowerCase())) {
+                showMessage('Этот никнейм уже занят. Пожалуйста, выберите другой.', 'error');
+                return;
+            }
+            
+            // Проверка уникальности email
+            if (registeredUsers.some(user => user.email.toLowerCase() === email.toLowerCase())) {
+                showMessage('Этот email уже зарегистрирован', 'error');
+                return;
+            }
+            
+            // Создание объекта пользователя
+            const user = {
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+                phone: phone || 'Не указан',
+                nickname: nickname,
+                password: password
+            };
+            
+            // Добавление пользователя в массив
+            registeredUsers.push(user);
+            
+            // Показываем страницу приветствия
+            document.getElementById('registration-form').style.display = 'none';
+            document.getElementById('welcome-page').style.display = 'block';
+            
+            // Заполняем данные на странице приветствия
+            document.getElementById('user-name').textContent = `${firstName} ${lastName}`;
+            document.getElementById('display-firstName').textContent = firstName;
+            document.getElementById('display-lastName').textContent = lastName;
+            document.getElementById('display-email').textContent = email;
+            document.getElementById('display-phone').textContent = phone || 'Не указан';
+            document.getElementById('display-nickname').textContent = nickname;
+            
+            showMessage('Регистрация прошла успешно! Добро пожаловать!', 'success');
+            
+            // Вывод в консоль для отладки
+            console.log('Зарегистрированные пользователи:', registeredUsers);
+        }
+        
+        function logout() {
+            // Возвращаемся к форме регистрации
+            document.getElementById('welcome-page').style.display = 'none';
+            document.getElementById('registration-form').style.display = 'block';
+            
+            // Очищаем поля формы
+            document.getElementById('firstName').value = '';
+            document.getElementById('lastName').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('phone').value = '';
+            document.getElementById('nickname').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('confirmPassword').value = '';
+            document.getElementById('terms').checked = false;
+            
+            showMessage('Вы вышли из системы. Вы можете зарегистрировать нового пользователя.', 'success');
+        }
+        
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+            
+            // Автоматически скрываем сообщение через 5 секунд
+            setTimeout(() => {
+                if (messageDiv.style.display === 'block') {
+                    messageDiv.style.display = 'none';
+                }
+            }, 5000);
+        }
+        
+        // Валидация в реальном времени
+        document.getElementById('email').addEventListener('blur', function() {
+            const email = this.value.trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (email && !emailRegex.test(email)) {
+                this.style.borderColor = '#dc3545';
+            } else {
+                this.style.borderColor = '#ddd';
+            }
+        });
+        
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            if (password.length > 0 && password.length < 8) {
+                this.style.borderColor = '#dc3545';
+            } else {
+                this.style.borderColor = '#ddd';
+            }
+        });
+        
+        document.getElementById('confirmPassword').addEventListener('input', function() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = this.value;
+            if (confirmPassword && password !== confirmPassword) {
+                this.style.borderColor = '#dc3545';
+            } else {
+                this.style.borderColor = '#ddd';
+            }
+        });
+        
+        document.getElementById('nickname').addEventListener('input', function() {
+            const nickname = this.value;
+            const nicknameRegex = /^[a-zA-Z0-9._-]+$/;
+            if (nickname && !nicknameRegex.test(nickname)) {
+                this.style.borderColor = '#dc3545';
+            } else {
+                this.style.borderColor = '#ddd';
+            }
+        });
+    </script>
+</body>
+</html>
