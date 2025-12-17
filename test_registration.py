@@ -30,13 +30,10 @@ class TestRegistrationPage:
             options=chrome_options
         )
         
-        # Получаем абсолютный путь к файлу registration.html
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        html_file_path = os.path.join(current_dir, "registration.html")
-        
-        # Формируем правильный URL для локального файла
-        file_url = f"file:///{html_file_path}"
-        print(f"Открываем URL: {file_url}")
+        # Открытие тестовой страницы на GitHub Pages
+        test_url = "https://ksksdiiee.github.io/ci-cd-lab9-autotests/registration.html"
+        print(f"Открываем URL: {test_url}")
+        self.driver.get(test_url)
         
         # Открытие тестовой страницы
         self.driver.get(file_url)
