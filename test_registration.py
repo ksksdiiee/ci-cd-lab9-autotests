@@ -37,9 +37,6 @@ class TestRegistrationPage:
         print(f"Открываем URL: {test_url}")
         self.driver.get(test_url)
         
-        # Открытие тестовой страницы
-        self.driver.get(file_url)
-        
         # Инициализация явного ожидания
         self.wait = WebDriverWait(self.driver, 10)
         
